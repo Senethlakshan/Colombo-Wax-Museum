@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colombo Wax Museum - 3D Virtual Tour</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Raleway', sans-serif;
+            overflow: hidden;
+            background: #000;
+            color: #fff;
+        }
+        
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        /* Logo overlay - HIDDEN to not disturb museum experience */
+        .museum-logo {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            text-align: center;
+            pointer-events: none;
+            animation: fadeInDown 1.5s ease-out;
+            display: none; /* Hidden - logo now on wall instead */
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        .logo-image {
+            width: 250px;
+            height: auto;
+            filter: drop-shadow(0 10px 30px rgba(212, 175, 55, 0.5));
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+        
+        .museum-title {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #d4af37, #f4e5c3, #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 8px;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+            margin-bottom: 5px;
+            animation: glow 3s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5)); }
+            50% { filter: drop-shadow(0 0 25px rgba(212, 175, 55, 0.8)); }
+        }
+        
+        .museum-tagline {
+            font-size: 0.9rem;
+            color: #d4af37;
+            letter-spacing: 3px;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+        
+        /* Welcome screen */
+        .welcome-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a0000, #4d0000);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s, visibility 1s;
+        }
+        
+        .welcome-screen.fading {
+            opacity: 0.3;
+            transition: opacity 0.8s;
+        }
+        
+        .welcome-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .welcome-content {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            border: 2px solid #d4af37;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.4);
+            max-width: 600px;
+        }
+        
+        .welcome-logo {
+            width: 250px;
+            margin-bottom: 2rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .welcome-text {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: #d4af37;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+        
+        .welcome-description {
+            font-size: 1.1rem;
+            color: #f4e5c3;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+        
+        .enter-button {
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(135deg, #d4af37, #f4e5c3);
+            color: #1a0000;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        }
+        
+        .enter-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.6);
+        }
+        
+        /* Controls UI */
+        .controls-panel {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(26, 0, 0, 0.9), rgba(77, 0, 0, 0.9));
+            padding: 1.5rem 2.5rem;
+            border-radius: 15px;
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 50;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            text-align: center;
+        }
+        
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .control-key {
+            background: rgba(212, 175, 55, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #d4af37;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #d4af37;
+            font-size: 1rem;
+            min-width: 60px;
+        }
+        
+        .control-label {
+            font-size: 0.85rem;
+            color: #f4e5c3;
+            font-weight: 300;
+        }
+        
+        /* Info popup for wax figures */
+        .figure-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(26, 0, 0, 0.95), rgba(77, 0, 0, 0.95));
+            padding: 2.5rem 3rem;
+            border-radius: 15px;
+            border: 2px solid #d4af37;
+            max-width: 500px;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+        }
+        
+        .figure-info.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .figure-name {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: #d4af37;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .figure-description {
+            color: #f4e5c3;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+        
+        .close-info {
+            background: #d4af37;
+            color: #1a0000;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Cinzel', serif;
+            transition: all 0.2s;
+        }
+        
+        .close-info:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.5);
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        /* Photo Gallery Overlay */
+        .photo-gallery {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 300;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 2rem;
+        }
+        
+        .photo-gallery.visible {
+            display: flex;
+        }
+        
+        .gallery-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            color: #d4af37;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .gallery-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            width: 100%;
+        }
+        
+        .gallery-item {
+            position: relative;
+            border: 3px solid #d4af37;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.4);
+            transition: transform 0.3s;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 50px rgba(212, 175, 55, 0.6);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            padding: 1.5rem;
+            color: #d4af37;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        .close-gallery {
+            margin-top: 2rem;
+            padding: 1rem 3rem;
+            background: linear-gradient(135deg, #d4af37, #f4e5c3);
+            color: #1a0000;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        }
+        
+        .close-gallery:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.6);
+        }
+        
+        .gallery-hint {
+            position: absolute;
+            bottom: 100px;
+            right: 30px;
+            background: rgba(212, 175, 55, 0.2);
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            z-index: 60;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            flex-direction: column;
+        }
+        
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(212, 175, 55, 0.2);
+            border-top: 4px solid #d4af37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 2rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            color: #d4af37;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading Wax Museum...</div>
+    </div>
+
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-content">
+            <img src="Assest/preview.webp" alt="Colombo Wax Museum Logo" class="welcome-logo" style="width: 300px; height: auto; border-radius: 15px; box-shadow: 0 20px 60px rgba(212, 175, 55, 0.6);">
+            <div class="welcome-text">Welcome to Virtual Tour</div>
+            <div class="welcome-description">
+                Experience lifelike wax figures of celebrities and historical icons in stunning 3D. Walk through our gallery and discover the stories behind each figure.
+            </div>
+            <button class="enter-button" onclick="enterMuseum()">ENTER MUSEUM</button>
+        </div>
+    </div>
+
+    <div id="canvas-container">
+        <!-- Museum Logo Header -->
+        <div class="museum-logo">
+            <img src="Assest/preview.webp" alt="Colombo Wax Museum" class="logo-image">
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid">
+                <div class="control-item">
+                    <div class="control-key">W A S D</div>
+                    <div class="control-label">Move</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">Mouse</div>
+                    <div class="control-label">Look Around</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">Shift</div>
+                    <div class="control-label">Run</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">Click</div>
+                    <div class="control-label">Lock View</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Figure Info Popup -->
+        <div class="figure-info" id="figureInfo">
+            <div class="figure-name" id="figureName">Celebrity Name</div>
+            <div class="figure-description" id="figureDescription">Description...</div>
+            <button class="close-info" onclick="closeInfo()">Close</button>
+        </div>
+        
+        <!-- Photo Gallery Overlay -->
+        <div class="photo-gallery" id="photoGallery">
+            <div class="gallery-title">🎭 Real Museum Photos 🎭</div>
+            <div class="gallery-images">
+                <div class="gallery-item">
+                    <img src="Assest/preview (1).webp" alt="Wax Figures Display">
+                    <div class="gallery-caption">Wax Figures on Display</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="Assest/s.png" alt="Museum Floor Plan">
+                    <div class="gallery-caption">Museum Layout</div>
+                </div>
+            </div>
+            <button class="close-gallery" onclick="closeGallery()">Close Gallery</button>
+        </div>
+        
+        <!-- Gallery Hint -->
+        <div class="gallery-hint">Press 'G' to view Real Photos 📸</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script>
+        // Initialize
+        let scene, camera, renderer;
+        let doorLeft, doorRight;
+        let isDoorsOpen = false;
+        let waxFigures = [];
+        let textureLoader;
+        let museumTexture;
+        let gltfLoader; // For loading 3D models
+
+        // Wax figure data (celebrities/icons)
+        const figuresData = [
+            { name: "Nelson Mandela", description: "Anti-apartheid revolutionary and political leader who served as President of South Africa.", color: 0x8B4513 },
+            { name: "Mahatma Gandhi", description: "Leader of Indian independence movement through nonviolent civil disobedience.", color: 0xD2691E },
+            { name: "Albert Einstein", description: "Theoretical physicist who developed the theory of relativity.", color: 0xA0522D },
+            { name: "Mother Teresa", description: "Catholic nun who dedicated her life to serving the poor.", color: 0xCD853F },
+            { name: "Leonardo da Vinci", description: "Italian polymath of the Renaissance, painter of the Mona Lisa.", color: 0x8B4513 },
+            { name: "William Shakespeare", description: "English playwright and poet, regarded as the greatest writer.", color: 0xD2691E },
+            { name: "Marie Curie", description: "Pioneer in radioactivity research and first woman to win Nobel Prize.", color: 0xA0522D },
+            { name: "Martin Luther King Jr.", description: "American civil rights leader who advanced civil rights through nonviolence.", color: 0xCD853F }
+        ];
+
+        function initScene() {
+            // Initialize texture loader
+            textureLoader = new THREE.TextureLoader();
+            
+            // Initialize GLTF loader for 3D models
+            gltfLoader = new THREE.GLTFLoader();
+            
+            // Load museum texture
+            museumTexture = textureLoader.load('Assest/preview (1).webp');
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0a);
+            scene.fog = new THREE.FogExp2(0x1a0000, 0.02);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 1.7, 25);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.3;
+            
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            createLighting();
+            createEnvironment();
+            createEntrance();
+            createWaxFigures();
+            
+            setupControls();
+            animate();
+        }
+
+        function createLighting() {
+            // Ambient light
+            const ambient = new THREE.AmbientLight(0xffffff, 0.3);
+            scene.add(ambient);
+
+            // Main dramatic light
+            const mainLight = new THREE.SpotLight(0xffd700, 1.5);
+            mainLight.position.set(0, 15, 0);
+            mainLight.angle = Math.PI / 3;
+            mainLight.penumbra = 0.5;
+            mainLight.castShadow = true;
+            scene.add(mainLight);
+
+            // Red accent lights (museum theme)
+            const redLight1 = new THREE.PointLight(0xff0000, 0.8, 30);
+            redLight1.position.set(-10, 5, 0);
+            scene.add(redLight1);
+
+            const redLight2 = new THREE.PointLight(0xff0000, 0.8, 30);
+            redLight2.position.set(10, 5, 0);
+            scene.add(redLight2);
+
+            // Gold accent lights
+            const goldLight1 = new THREE.PointLight(0xd4af37, 1, 20);
+            goldLight1.position.set(0, 8, -15);
+            scene.add(goldLight1);
+        }
+
+        function createEnvironment() {
+            // Luxurious red carpet floor
+            const carpetGeometry = new THREE.PlaneGeometry(8, 50);
+            const carpetMaterial = new THREE.MeshStandardMaterial({
+                color: 0x8B0000,
+                roughness: 0.9,
+                metalness: 0.1
+            });
+            const carpet = new THREE.Mesh(carpetGeometry, carpetMaterial);
+            carpet.rotation.x = -Math.PI / 2;
+            carpet.position.y = 0.01;
+            carpet.receiveShadow = true;
+            scene.add(carpet);
+
+            // Side floors (marble-like)
+            const floorGeometry = new THREE.PlaneGeometry(50, 50);
+            const floorMaterial = new THREE.MeshStandardMaterial({
+                color: 0x2a2a2a,
+                roughness: 0.3,
+                metalness: 0.7
+            });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true;
+            scene.add(floor);
+
+            // Walls - elegant dark with gold trim
+            const wallMaterial = new THREE.MeshStandardMaterial({
+                color: 0x1a0000,
+                roughness: 0.8,
+                metalness: 0.2
+            });
+
+            // Left wall
+            const leftWall = new THREE.Mesh(
+                new THREE.BoxGeometry(0.3, 10, 60),
+                wallMaterial
+            );
+            leftWall.position.set(-20, 5, 0);
+            leftWall.receiveShadow = true;
+            scene.add(leftWall);
+
+            // Right wall
+            const rightWall = new THREE.Mesh(
+                new THREE.BoxGeometry(0.3, 10, 60),
+                wallMaterial
+            );
+            rightWall.position.set(20, 5, 0);
+            rightWall.receiveShadow = true;
+            scene.add(rightWall);
+
+            // Back wall
+            const backWall = new THREE.Mesh(
+                new THREE.BoxGeometry(40, 10, 0.3),
+                wallMaterial
+            );
+            backWall.position.set(0, 5, -30);
+            backWall.receiveShadow = true;
+            scene.add(backWall);
+
+            // Gold trim along walls
+            const goldTrimMaterial = new THREE.MeshStandardMaterial({
+                color: 0xd4af37,
+                roughness: 0.2,
+                metalness: 0.9,
+                emissive: 0xd4af37,
+                emissiveIntensity: 0.3
+            });
+
+            for (let z = -25; z < 25; z += 5) {
+                const trim = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.1, 0.2, 0.5),
+                    goldTrimMaterial
+                );
+                trim.position.set(-20, 2, z);
+                scene.add(trim);
+
+                const trim2 = trim.clone();
+                trim2.position.set(20, 2, z);
+                scene.add(trim2);
+            }
+
+            // Ceiling
+            const ceilingMaterial = new THREE.MeshStandardMaterial({
+                color: 0x0a0a0a,
+                roughness: 0.9
+            });
+            const ceiling = new THREE.Mesh(
+                new THREE.PlaneGeometry(50, 60),
+                ceilingMaterial
+            );
+            ceiling.rotation.x = Math.PI / 2;
+            ceiling.position.y = 10;
+            scene.add(ceiling);
+            
+            // Add decorative photo frames on walls
+            createPhotoFrames();
+        }
+        
+        function createPhotoFrames() {
+            // Create photo frames on the back wall with museum images
+            const framePositions = [
+                { x: -8, y: 5, z: -29.8 },
+                { x: 0, y: 5, z: -29.8 },
+                { x: 8, y: 5, z: -29.8 }
+            ];
+            
+            framePositions.forEach((pos, index) => {
+                // Frame border (gold)
+                const frameBorder = new THREE.Mesh(
+                    new THREE.BoxGeometry(3.2, 2.2, 0.1),
+                    new THREE.MeshStandardMaterial({
+                        color: 0xd4af37,
+                        roughness: 0.3,
+                        metalness: 0.8
+                    })
+                );
+                frameBorder.position.set(pos.x, pos.y, pos.z);
+                scene.add(frameBorder);
+                
+                // Photo inside frame
+                if (museumTexture) {
+                    const photoMaterial = new THREE.MeshStandardMaterial({
+                        map: museumTexture,
+                        roughness: 0.5
+                    });
+                    const photo = new THREE.Mesh(
+                        new THREE.PlaneGeometry(3, 2),
+                        photoMaterial
+                    );
+                    photo.position.set(pos.x, pos.y, pos.z + 0.06);
+                    scene.add(photo);
+                }
+                
+                // Spotlight for each frame
+                const frameLight = new THREE.SpotLight(0xffd700, 0.8);
+                frameLight.position.set(pos.x, pos.y + 2, pos.z + 1);
+                frameLight.angle = Math.PI / 6;
+                frameLight.penumbra = 0.5;
+                scene.add(frameLight);
+            });
+            
+            // ===== LARGE MUSEUM LOGO ON BACK WALL =====
+            // Load logo texture
+            const logoTexture = textureLoader.load('Assest/preview.webp');
+            
+            // Large gold frame for logo (center of back wall)
+            const logoFrameBorder = new THREE.Mesh(
+                new THREE.BoxGeometry(6.5, 4.5, 0.15),
+                new THREE.MeshStandardMaterial({
+                    color: 0xd4af37,
+                    roughness: 0.2,
+                    metalness: 0.9,
+                    emissive: 0xd4af37,
+                    emissiveIntensity: 0.2
+                })
+            );
+            logoFrameBorder.position.set(0, 7, -29.7);
+            scene.add(logoFrameBorder);
+            
+            // Museum logo inside frame
+            const logoMaterial = new THREE.MeshStandardMaterial({
+                map: logoTexture,
+                roughness: 0.4
+            });
+            const logoPlane = new THREE.Mesh(
+                new THREE.PlaneGeometry(6, 4),
+                logoMaterial
+            );
+            logoPlane.position.set(0, 7, -29.6);
+            scene.add(logoPlane);
+            
+            // Dramatic spotlights for logo
+            const logoSpotlight1 = new THREE.SpotLight(0xffd700, 2.5);
+            logoSpotlight1.position.set(-3, 9, -28);
+            logoSpotlight1.angle = Math.PI / 6;
+            logoSpotlight1.penumbra = 0.4;
+            scene.add(logoSpotlight1);
+            
+            const logoSpotlight2 = new THREE.SpotLight(0xffd700, 2.5);
+            logoSpotlight2.position.set(3, 9, -28);
+            logoSpotlight2.angle = Math.PI / 6;
+            logoSpotlight2.penumbra = 0.4;
+            scene.add(logoSpotlight2);
+        }
+
+        function createEntrance() {
+            // Door frame (gold)
+            const frameGroup = new THREE.Group();
+            
+            const frameMaterial = new THREE.MeshStandardMaterial({
+                color: 0xd4af37,
+                roughness: 0.3,
+                metalness: 0.8,
+                emissive: 0xd4af37,
+                emissiveIntensity: 0.2
+            });
+
+            // Top of frame
+            const frameTop = new THREE.Mesh(
+                new THREE.BoxGeometry(8, 0.3, 0.3),
+                frameMaterial
+            );
+            frameTop.position.set(0, 5, 23);
+            frameGroup.add(frameTop);
+
+            // Left side
+            const frameLeft = new THREE.Mesh(
+                new THREE.BoxGeometry(0.3, 5, 0.3),
+                frameMaterial
+            );
+            frameLeft.position.set(-4, 2.5, 23);
+            frameGroup.add(frameLeft);
+
+            // Right side
+            const frameRight = new THREE.Mesh(
+                new THREE.BoxGeometry(0.3, 5, 0.3),
+                frameMaterial
+            );
+            frameRight.position.set(4, 2.5, 23);
+            frameGroup.add(frameRight);
+
+            scene.add(frameGroup);
+
+            // Doors (red with gold handles)
+            const doorMaterial = new THREE.MeshStandardMaterial({
+                color: 0x8B0000,
+                roughness: 0.4,
+                metalness: 0.6
+            });
+
+            doorLeft = new THREE.Mesh(
+                new THREE.BoxGeometry(3.8, 5, 0.2),
+                doorMaterial
+            );
+            doorLeft.position.set(-2, 2.5, 23);
+            doorLeft.castShadow = true;
+            scene.add(doorLeft);
+
+            doorRight = new THREE.Mesh(
+                new THREE.BoxGeometry(3.8, 5, 0.2),
+                doorMaterial
+            );
+            doorRight.position.set(2, 2.5, 23);
+            doorRight.castShadow = true;
+            scene.add(doorRight);
+
+            // Door handles (gold)
+            const handleMaterial = new THREE.MeshStandardMaterial({
+                color: 0xd4af37,
+                roughness: 0.2,
+                metalness: 0.9
+            });
+
+            const handleLeft = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.1, 0.1, 0.5),
+                handleMaterial
+            );
+            handleLeft.rotation.z = Math.PI / 2;
+            handleLeft.position.set(-0.5, 2.5, 23.2);
+            scene.add(handleLeft);
+
+            const handleRight = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.1, 0.1, 0.5),
+                handleMaterial
+            );
+            handleRight.rotation.z = Math.PI / 2;
+            handleRight.position.set(0.5, 2.5, 23.2);
+            scene.add(handleRight);
+
+            // Welcome sign above door
+            createWelcomeSign();
+        }
+
+        function createWelcomeSign() {
+            const signGeometry = new THREE.PlaneGeometry(6, 1.5);
+            const signMaterial = new THREE.MeshStandardMaterial({
+                color: 0x8B0000,
+                emissive: 0x8B0000,
+                emissiveIntensity: 0.5
+            });
+            const sign = new THREE.Mesh(signGeometry, signMaterial);
+            sign.position.set(0, 7, 23);
+            scene.add(sign);
+
+            // Add spotlight for sign
+            const signLight = new THREE.SpotLight(0xd4af37, 2);
+            signLight.position.set(0, 9, 24);
+            signLight.target = sign;
+            signLight.angle = Math.PI / 6;
+            scene.add(signLight);
+        }
+
+        function createWaxFigures() {
+            const positions = [
+                { x: -12, z: 5 },
+                { x: -12, z: -5 },
+                { x: -12, z: -15 },
+                { x: -12, z: -25 },
+                { x: 12, z: 5 },
+                { x: 12, z: -5 },
+                { x: 12, z: -15 },
+                { x: 12, z: -25 }
+            ];
+
+            positions.forEach((pos, index) => {
+                if (index < figuresData.length) {
+                    createWaxFigure(pos.x, pos.z, figuresData[index], index);
+                }
+            });
+        }
+
+        function createWaxFigure(x, z, data, index) {
+            const figureGroup = new THREE.Group();
+
+            // Pedestal (white marble-like)
+            const pedestalGeometry = new THREE.CylinderGeometry(1.2, 1.4, 0.4, 32);
+            const pedestalMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                roughness: 0.3,
+                metalness: 0.7
+            });
+            const pedestal = new THREE.Mesh(pedestalGeometry, pedestalMaterial);
+            pedestal.position.y = 0.2;
+            pedestal.castShadow = true;
+            figureGroup.add(pedestal);
+
+            // Blue circular light platform (like in your image)
+            const platformGeometry = new THREE.CylinderGeometry(1.3, 1.3, 0.05, 32);
+            const platformMaterial = new THREE.MeshStandardMaterial({
+                color: 0x0066ff,
+                emissive: 0x0066ff,
+                emissiveIntensity: 0.7,
+                transparent: true,
+                opacity: 0.8
+            });
+            const platform = new THREE.Mesh(platformGeometry, platformMaterial);
+            platform.position.y = 0.02;
+            figureGroup.add(platform);
+
+            // Load 3D GLB model - alternate between men and girls
+            const modelPath = (index % 2 === 0) ? 'Assest/3d/men.glb' : 'Assest/3d/girls.glb';
+            
+            gltfLoader.load(
+                modelPath,
+                (gltf) => {
+                    const model = gltf.scene;
+                    
+                    // Scale and position the model
+                    model.scale.set(3.0, 3.0, 3.0); // Increased for full-size realistic human figure
+                    model.position.y = 3.0; // Raised higher to show full body including legs and feet
+                    
+                    // Enable shadows for the model
+                    model.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                    
+                    figureGroup.add(model);
+                },
+                (progress) => {
+                    // Loading progress (optional)
+                    console.log(`Loading ${modelPath}: ${(progress.loaded / progress.total * 100).toFixed(2)}%`);
+                },
+                (error) => {
+                    console.error(`Error loading ${modelPath}:`, error);
+                    // Fallback: create simple placeholder if model fails to load
+                    const fallbackGeometry = new THREE.CylinderGeometry(0.3, 0.4, 1.5, 16);
+                    const fallbackMaterial = new THREE.MeshStandardMaterial({
+                        color: data.color,
+                        roughness: 0.6,
+                        metalness: 0.1
+                    });
+                    const fallback = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
+                    fallback.position.y = 1.2;
+                    fallback.castShadow = true;
+                    figureGroup.add(fallback);
+                }
+            );
+
+
+            // ===== DRAMATIC MUSEUM LIGHTING SYSTEM =====
+            
+            // 1. Main spotlight from above (warm white/golden)
+            const mainSpotlight = new THREE.SpotLight(0xffd700, 3.5);
+            mainSpotlight.position.set(x, 10, z);
+            mainSpotlight.angle = Math.PI / 6;
+            mainSpotlight.penumbra = 0.4;
+            mainSpotlight.distance = 15;
+            mainSpotlight.castShadow = true;
+            mainSpotlight.shadow.mapSize.width = 1024;
+            mainSpotlight.shadow.mapSize.height = 1024;
+            scene.add(mainSpotlight);
+
+            // 2. Front accent light (warm orange glow)
+            const frontLight = new THREE.SpotLight(0xff8c00, 2.5);
+            frontLight.position.set(x, 6, z + 5);
+            frontLight.angle = Math.PI / 5;
+            frontLight.penumbra = 0.6;
+            frontLight.distance = 12;
+            scene.add(frontLight);
+
+            // 3. Side spotlight (left) - warm amber
+            const leftSpotlight = new THREE.SpotLight(0xffaa33, 2.0);
+            leftSpotlight.position.set(x - 4, 7, z);
+            leftSpotlight.angle = Math.PI / 4;
+            leftSpotlight.penumbra = 0.5;
+            leftSpotlight.distance = 10;
+            scene.add(leftSpotlight);
+
+            // 4. Side spotlight (right) - warm amber
+            const rightSpotlight = new THREE.SpotLight(0xffaa33, 2.0);
+            rightSpotlight.position.set(x + 4, 7, z);
+            rightSpotlight.angle = Math.PI / 4;
+            rightSpotlight.penumbra = 0.5;
+            rightSpotlight.distance = 10;
+            scene.add(rightSpotlight);
+
+            // 5. Back rim light (golden highlight)
+            const backRimLight = new THREE.SpotLight(0xffd700, 1.8);
+            backRimLight.position.set(x, 5, z - 3);
+            backRimLight.angle = Math.PI / 3;
+            backRimLight.penumbra = 0.7;
+            backRimLight.distance = 8;
+            scene.add(backRimLight);
+
+            // 6. Blue platform glow (keep the blue circular light)
+            const platformGlow = new THREE.PointLight(0x0066ff, 1.5, 4);
+            platformGlow.position.set(x, 0.5, z);
+            scene.add(platformGlow);
+
+            // 7. Warm fill light (soft overall illumination)
+            const fillLight = new THREE.PointLight(0xffcc66, 1.2, 8);
+            fillLight.position.set(x, 4, z + 2);
+            scene.add(fillLight);
+
+
+            figureGroup.position.set(x, 0, z);
+            scene.add(figureGroup);
+
+            waxFigures.push({
+                mesh: figureGroup,
+                data: data,
+                position: new THREE.Vector3(x, 0, z)
+            });
+        }
+
+        function openDoors() {
+            if (isDoorsOpen) return;
+            isDoorsOpen = true;
+
+            const duration = 2000;
+            const startTime = Date.now();
+            const startPosLeft = doorLeft.position.x;
+            const startPosRight = doorRight.position.x;
+            const targetPosLeft = -5.5;
+            const targetPosRight = 5.5;
+
+            function animateDoors() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+
+                doorLeft.position.x = startPosLeft + (targetPosLeft - startPosLeft) * eased;
+                doorRight.position.x = startPosRight + (targetPosRight - startPosRight) * eased;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateDoors);
+                }
+            }
+
+            animateDoors();
+        }
+
+        // Controls
+        const keys = {};
+        let isPointerLocked = false;
+        const euler = new THREE.Euler(0, 0, 0, 'YXZ');
+
+        function setupControls() {
+            document.addEventListener('keydown', (e) => {
+                keys[e.key.toLowerCase()] = true;
+                
+                // Toggle photo gallery with 'G' key
+                if (e.key.toLowerCase() === 'g') {
+                    toggleGallery();
+                }
+            });
+
+            document.addEventListener('keyup', (e) => {
+                keys[e.key.toLowerCase()] = false;
+            });
+
+            renderer.domElement.addEventListener('click', () => {
+                renderer.domElement.requestPointerLock();
+            });
+
+            document.addEventListener('pointerlockchange', () => {
+                isPointerLocked = document.pointerLockElement === renderer.domElement;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isPointerLocked) return;
+
+                euler.setFromQuaternion(camera.quaternion);
+                euler.y -= (e.movementX || 0) * 0.002;
+                euler.x -= (e.movementY || 0) * 0.002;
+                euler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, euler.x));
+                camera.quaternion.setFromEuler(euler);
+            });
+        }
+
+        function checkFigureProximity() {
+            waxFigures.forEach(figure => {
+                const distance = camera.position.distanceTo(figure.position);
+                if (distance < 3) {
+                    showFigureInfo(figure.data);
+                }
+            });
+        }
+
+        function showFigureInfo(data) {
+            document.getElementById('figureName').textContent = data.name;
+            document.getElementById('figureDescription').textContent = data.description;
+            document.getElementById('figureInfo').classList.add('visible');
+
+            setTimeout(() => {
+                closeInfo();
+            }, 5000);
+        }
+
+        function closeInfo() {
+            document.getElementById('figureInfo').classList.remove('visible');
+        }
+        
+        function toggleGallery() {
+            const gallery = document.getElementById('photoGallery');
+            gallery.classList.toggle('visible');
+        }
+        
+        function closeGallery() {
+            document.getElementById('photoGallery').classList.remove('visible');
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Movement
+            const speed = keys['shift'] ? 0.15 : 0.08;
+            const direction = new THREE.Vector3();
+
+            camera.getWorldDirection(direction);
+            direction.y = 0;
+            direction.normalize();
+
+            const right = new THREE.Vector3();
+            right.crossVectors(camera.up, direction).normalize();
+
+            if (keys['w']) camera.position.addScaledVector(direction, -speed);
+            if (keys['s']) camera.position.addScaledVector(direction, speed);
+            if (keys['a']) camera.position.addScaledVector(right, -speed);
+            if (keys['d']) camera.position.addScaledVector(right, speed);
+
+            camera.position.y = 1.7;
+
+            // Boundaries
+            camera.position.x = Math.max(-18, Math.min(18, camera.position.x));
+            camera.position.z = Math.max(-28, Math.min(24, camera.position.z));
+
+            // Check proximity to figures
+            checkFigureProximity();
+
+            renderer.render(scene, camera);
+        }
+
+        function enterMuseum() {
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            
+            // Stage 1: Fade welcome screen to semi-transparent immediately
+            welcomeScreen.classList.add('fading');
+            
+            // Stage 2: Start opening doors (visible through faded welcome screen)
+            setTimeout(() => {
+                openDoors();
+            }, 300);
+            
+            // Stage 3: Completely hide welcome screen after doors are opening
+            setTimeout(() => {
+                welcomeScreen.classList.remove('fading');
+                welcomeScreen.classList.add('hidden');
+            }, 1500); // Wait 1.5 seconds to show door animation
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'none';
+                initScene();
+            }, 2000);
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
