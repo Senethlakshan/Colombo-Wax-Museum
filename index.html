@@ -1217,57 +1217,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script>
-        // ===== DEVICE DETECTION AND ROUTING =====
-        
-        function isMobileDevice() {
-            // Check user agent
-            const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
-            const isMobileUA = mobileRegex.test(navigator.userAgent);
-            
-            // Check screen width
-            const isSmallScreen = window.innerWidth < 768;
-            
-            // Check if user explicitly wants desktop version
-            const urlParams = new URLSearchParams(window.location.search);
-            const forceDesktop = urlParams.get('desktop') === 'true';
-            
-            return (isMobileUA || isSmallScreen) && !forceDesktop;
-        }
-        
-        function initApp() {
-            const mobileSite = document.getElementById('mobile-site');
-            const canvasContainer = document.getElementById('canvas-container');
-            const welcomeScreen = document.getElementById('welcomeScreen');
-            const loadingScreen = document.getElementById('loadingScreen');
-            
-            if (isMobileDevice()) {
-                // Show mobile landing page
-                mobileSite.style.display = 'block';
-                canvasContainer.style.display = 'none';
-                welcomeScreen.style.display = 'none';
-                loadingScreen.style.display = 'none';
-                
-                console.log('Mobile device detected - showing landing page');
-            } else {
-                // Show desktop 3D museum
-                mobileSite.style.display = 'none';
-                canvasContainer.style.display = 'block';
-                
-                // Initialize 3D museum
-                setTimeout(() => {
-                    initScene();
-                    loadingScreen.style.display = 'none';
-                }, 1000);
-                
-                console.log('Desktop device detected - loading 3D museum');
-            }
-        }
-        
-        // Run on page load
-        window.addEventListener('DOMContentLoaded', initApp);
-        
-        // ===== EXISTING 3D MUSEUM CODE =====
-        
         // Initialize
         let scene, camera, renderer;
         let doorLeft, doorRight;
