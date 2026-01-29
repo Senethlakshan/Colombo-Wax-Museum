@@ -168,19 +168,132 @@
             box-shadow: 0 15px 40px rgba(212, 175, 55, 0.6);
         }
         
-        /* Controls UI */
-        .controls-panel {
+        /* Bottom Center Navigation Bar - Modern Rounded Design */
+        .top-navbar {
             position: absolute;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
+            width: auto;
+            background: linear-gradient(135deg, rgba(26, 0, 0, 0.95), rgba(77, 0, 0, 0.95));
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            border-radius: 50px;
+            border: 2px solid rgba(212, 175, 55, 0.6);
+            backdrop-filter: blur(15px);
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+        
+        .navbar-logo {
+            display: none; /* Hide logo in bottom nav */
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .navbar-menu li {
+            position: relative;
+        }
+        
+        .navbar-menu a {
+            color: #f4e5c3;
+            text-decoration: none;
+            font-family: 'Raleway', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            transition: all 0.3s;
+            position: relative;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid transparent;
+            display: block;
+        }
+        
+        .navbar-menu a:hover {
+            color: #d4af37;
+            background: rgba(212, 175, 55, 0.25);
+            border-color: #d4af37;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+        
+        .navbar-menu a.active {
+            color: #1a0000;
+            background: linear-gradient(135deg, #d4af37, #f4e5c3);
+            border-color: #d4af37;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.5);
+        }
+        
+        .navbar-menu a::after {
+            display: none; /* Remove underline effect for rounded design */
+        }
+
+        
+        /* Left Side Controls Guide */
+        .controls-guide {
+            position: absolute;
+            left: 20px;
+            top: 100px;
             background: linear-gradient(135deg, rgba(26, 0, 0, 0.9), rgba(77, 0, 0, 0.9));
-            padding: 1.5rem 2.5rem;
-            border-radius: 15px;
+            padding: 1rem;
+            border-radius: 12px;
             border: 2px solid rgba(212, 175, 55, 0.5);
             backdrop-filter: blur(10px);
             z-index: 50;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            max-width: 200px;
+        }
+        
+        .controls-title {
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            color: #d4af37;
+            margin-bottom: 0.8rem;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.6rem;
+        }
+        
+        .control-key-small {
+            background: rgba(212, 175, 55, 0.2);
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            border: 1px solid #d4af37;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #d4af37;
+            font-size: 0.75rem;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .control-text {
+            font-size: 0.75rem;
+            color: #f4e5c3;
+            font-weight: 400;
+        }
+        
+        /* Hide old bottom controls */
+        .controls-panel {
+            display: none;
         }
         
         .controls-grid {
@@ -412,6 +525,507 @@
             font-size: 1.5rem;
             color: #d4af37;
         }
+        
+        /* ===== MOBILE LANDING PAGE ===== */
+        
+        #mobile-site {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a0000, #4d0000, #1a0000);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .mobile-hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            background: linear-gradient(135deg, rgba(26, 0, 0, 0.9), rgba(77, 0, 0, 0.9));
+        }
+        
+        .mobile-logo {
+            width: 250px;
+            max-width: 80%;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.6);
+            animation: fadeInScale 1.5s ease-out;
+        }
+        
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .mobile-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: #d4af37;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+        
+        .mobile-tagline {
+            font-size: 1.1rem;
+            color: #f4e5c3;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .mobile-cta {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(135deg, #d4af37, #f4e5c3);
+            color: #1a0000;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            animation: fadeInUp 1s ease-out 0.9s both, pulse 2s ease-in-out 2s infinite;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .mobile-section {
+            padding: 3rem 1.5rem;
+            animation: fadeInUp 1s ease-out both;
+        }
+        
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: #d4af37;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+        
+        .mobile-gallery {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .gallery-card {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid #d4af37;
+            transition: transform 0.3s;
+        }
+        
+        .gallery-card:active {
+            transform: scale(0.98);
+        }
+        
+        .gallery-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, rgba(26, 0, 0, 0.9), rgba(77, 0, 0, 0.9));
+            padding: 2rem;
+            border-radius: 15px;
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            color: #d4af37;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .feature-desc {
+            color: #f4e5c3;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .desktop-cta-section {
+            padding: 4rem 1.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
+        }
+        
+        .desktop-cta-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: #d4af37;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .desktop-cta-text {
+            color: #f4e5c3;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .desktop-link-btn {
+            padding: 1.2rem 3rem;
+            font-size: 1.2rem;
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(135deg, #d4af37, #f4e5c3);
+            color: #1a0000;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.6);
+            animation: pulse 2s ease-in-out infinite;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #d4af37;
+            font-size: 2rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+        
+        /* ===== MOBILE RESPONSIVE DESIGN ===== */
+        
+        /* Tablet (Portrait) */
+        @media screen and (max-width: 1024px) {
+            .top-navbar {
+                padding: 0.7rem 1.5rem;
+                bottom: 20px;
+            }
+            
+            .navbar-menu a {
+                font-size: 0.85rem;
+                padding: 0.5rem 1.2rem;
+            }
+            
+            .controls-guide {
+                max-width: 180px;
+                padding: 0.8rem;
+                left: 15px;
+                top: 80px;
+            }
+            
+            .controls-title {
+                font-size: 0.8rem;
+            }
+            
+            .control-key-small {
+                font-size: 0.7rem;
+                padding: 0.25rem 0.5rem;
+                min-width: 45px;
+            }
+            
+            .control-text {
+                font-size: 0.7rem;
+            }
+        }
+        
+        /* Mobile (Landscape) */
+        @media screen and (max-width: 768px) {
+            .welcome-content {
+                padding: 2rem;
+                max-width: 90%;
+            }
+            
+            .welcome-logo {
+                width: 200px;
+            }
+            
+            .welcome-text {
+                font-size: 1.5rem;
+            }
+            
+            .welcome-description {
+                font-size: 1rem;
+            }
+            
+            .enter-button {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
+            
+            .top-navbar {
+                padding: 0.6rem 1rem;
+                bottom: 15px;
+                gap: 0.3rem;
+            }
+            
+            .navbar-menu {
+                gap: 0.3rem;
+            }
+            
+            .navbar-menu a {
+                font-size: 0.75rem;
+                padding: 0.5rem 1rem;
+            }
+            
+            .controls-guide {
+                max-width: 150px;
+                padding: 0.7rem;
+                left: 10px;
+                top: 70px;
+            }
+            
+            .controls-title {
+                font-size: 0.75rem;
+                margin-bottom: 0.6rem;
+            }
+            
+            .control-row {
+                margin-bottom: 0.4rem;
+            }
+            
+            .control-key-small {
+                font-size: 0.65rem;
+                padding: 0.2rem 0.4rem;
+                min-width: 40px;
+            }
+            
+            .control-text {
+                font-size: 0.65rem;
+            }
+            
+            .gallery-hint {
+                bottom: 80px;
+                right: 15px;
+                font-size: 0.8rem;
+                padding: 0.6rem 1rem;
+            }
+            
+            .gallery-title {
+                font-size: 2rem;
+            }
+            
+            .gallery-images {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .figure-info {
+                padding: 2rem;
+                max-width: 90%;
+            }
+            
+            .figure-name {
+                font-size: 1.5rem;
+            }
+            
+            .figure-description {
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* Mobile (Portrait) */
+        @media screen and (max-width: 480px) {
+            .welcome-content {
+                padding: 1.5rem;
+            }
+            
+            .welcome-logo {
+                width: 150px;
+            }
+            
+            .welcome-text {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .welcome-description {
+                font-size: 0.9rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .enter-button {
+                padding: 0.7rem 1.5rem;
+                font-size: 0.9rem;
+            }
+            
+            /* Stack navbar items vertically on very small screens */
+            .top-navbar {
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 0.5rem;
+                bottom: 10px;
+                max-width: 95%;
+            }
+            
+            .navbar-menu {
+                gap: 0.25rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .navbar-menu a {
+                font-size: 0.7rem;
+                padding: 0.4rem 0.8rem;
+            }
+            
+            /* Make controls guide collapsible on mobile */
+            .controls-guide {
+                max-width: 130px;
+                padding: 0.5rem;
+                left: 5px;
+                top: 60px;
+                opacity: 0.8;
+            }
+            
+            .controls-title {
+                font-size: 0.7rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .control-row {
+                margin-bottom: 0.3rem;
+            }
+            
+            .control-key-small {
+                font-size: 0.6rem;
+                padding: 0.2rem 0.3rem;
+                min-width: 35px;
+            }
+            
+            .control-text {
+                font-size: 0.6rem;
+            }
+            
+            .gallery-hint {
+                bottom: 70px;
+                right: 10px;
+                font-size: 0.7rem;
+                padding: 0.5rem 0.8rem;
+            }
+            
+            .gallery-title {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .gallery-images {
+                gap: 1rem;
+            }
+            
+            .gallery-caption {
+                font-size: 1rem;
+                padding: 1rem;
+            }
+            
+            .close-gallery {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
+            
+            .figure-info {
+                padding: 1.5rem;
+                max-width: 95%;
+            }
+            
+            .figure-name {
+                font-size: 1.2rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .figure-description {
+                font-size: 0.85rem;
+                margin-bottom: 1rem;
+            }
+            
+            .close-info {
+                padding: 0.6rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* Touch-friendly enhancements */
+        @media (hover: none) and (pointer: coarse) {
+            /* Larger touch targets for mobile */
+            .navbar-menu a {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .enter-button,
+            .close-info,
+            .close-gallery {
+                min-height: 44px;
+            }
+            
+            /* Remove hover effects on touch devices */
+            .navbar-menu a:hover {
+                transform: none;
+            }
+            
+            /* Add active state for touch */
+            .navbar-menu a:active {
+                transform: scale(0.95);
+                background: rgba(212, 175, 55, 0.3);
+            }
+        }
     </style>
 </head>
 <body>
@@ -433,13 +1047,125 @@
         </div>
     </div>
 
+    <!-- Mobile Landing Page -->
+    <div id="mobile-site">
+        <!-- Hero Section -->
+        <section class="mobile-hero">
+            <img src="Assest/preview.webp" alt="Colombo Wax Museum" class="mobile-logo">
+            <h1 class="mobile-title">Colombo Wax Museum</h1>
+            <p class="mobile-tagline">
+                Experience history's greatest legends brought to life in stunning detail. Explore our collection of lifelike wax figures.
+            </p>
+            <a href="#gallery" class="mobile-cta">Explore Museum</a>
+            <div class="scroll-indicator">↓</div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="gallery" class="mobile-section">
+            <h2 class="section-title">🎭 Museum Gallery</h2>
+            <div class="mobile-gallery">
+                <div class="gallery-card">
+                    <img src="Assest/preview (1).webp" alt="Wax Figures Display">
+                </div>
+                <div class="gallery-card">
+                    <img src="Assest/3d/1222.png" alt="Virtual Museum Experience">
+                </div>
+                <div class="gallery-card">
+                    <img src="Assest/s.png" alt="Museum Layout">
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="mobile-section">
+            <h2 class="section-title">✨ What We Offer</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎭</div>
+                    <h3 class="feature-title">8 Legendary Figures</h3>
+                    <p class="feature-desc">Meet historical icons and celebrities including Nelson Mandela, Mahatma Gandhi, Albert Einstein, and more.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌟</div>
+                    <h3 class="feature-title">Realistic 3D Models</h3>
+                    <p class="feature-desc">Experience lifelike wax figures with stunning detail and professional museum-quality lighting.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💡</div>
+                    <h3 class="feature-title">Dramatic Lighting</h3>
+                    <p class="feature-desc">56+ spotlights create an immersive museum atmosphere with warm golden and orange tones.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎮</div>
+                    <h3 class="feature-title">Interactive Experience</h3>
+                    <p class="feature-desc">Walk freely through the museum, interact with exhibits, and discover fascinating stories.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Desktop CTA Section -->
+        <section class="desktop-cta-section">
+            <h2 class="desktop-cta-title">🖥️ Want the Full Experience?</h2>
+            <p class="desktop-cta-text">
+                For the complete 3D virtual tour with WASD controls and immersive exploration, visit us on a desktop computer!
+            </p>
+            <a href="?desktop=true" class="desktop-link-btn">View Full 3D Experience on Desktop 🚀</a>
+        </section>
+    </div>
+
     <div id="canvas-container">
-        <!-- Museum Logo Header -->
+        <!-- Top Navigation Bar -->
+        <nav class="top-navbar">
+            <div class="navbar-logo">
+                🎭 Colombo Wax Museum
+            </div>
+            <ul class="navbar-menu">
+                <li><a href="#" class="active">Home</a></li>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#virtual">Virtual Experience</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+
+        <!-- Left Side Controls Guide -->
+        <div class="controls-guide">
+            <div class="controls-title">🎮 Controls</div>
+            <div class="control-row">
+                <div class="control-key-small">W</div>
+                <div class="control-text">Forward</div>
+            </div>
+            <div class="control-row">
+                <div class="control-key-small">A</div>
+                <div class="control-text">Left</div>
+            </div>
+            <div class="control-row">
+                <div class="control-key-small">S</div>
+                <div class="control-text">Back</div>
+            </div>
+            <div class="control-row">
+                <div class="control-key-small">D</div>
+                <div class="control-text">Right</div>
+            </div>
+            <div class="control-row">
+                <div class="control-key-small">Mouse</div>
+                <div class="control-text">Look</div>
+            </div>
+            <div class="control-row">
+                <div class="control-key-small">Shift</div>
+                <div class="control-text">Run</div>
+            </div>
+            <div class="control-row">
+                <div class="control-key-small">G</div>
+                <div class="control-text">Gallery</div>
+            </div>
+        </div>
+
+        <!-- Museum Logo Header (Hidden) -->
         <div class="museum-logo">
             <img src="Assest/preview.webp" alt="Colombo Wax Museum" class="logo-image">
         </div>
 
-        <!-- Controls Panel -->
+        <!-- Old Controls Panel (Hidden by CSS) -->
         <div class="controls-panel">
             <div class="controls-grid">
                 <div class="control-item">
@@ -491,6 +1217,57 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script>
+        // ===== DEVICE DETECTION AND ROUTING =====
+        
+        function isMobileDevice() {
+            // Check user agent
+            const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+            const isMobileUA = mobileRegex.test(navigator.userAgent);
+            
+            // Check screen width
+            const isSmallScreen = window.innerWidth < 768;
+            
+            // Check if user explicitly wants desktop version
+            const urlParams = new URLSearchParams(window.location.search);
+            const forceDesktop = urlParams.get('desktop') === 'true';
+            
+            return (isMobileUA || isSmallScreen) && !forceDesktop;
+        }
+        
+        function initApp() {
+            const mobileSite = document.getElementById('mobile-site');
+            const canvasContainer = document.getElementById('canvas-container');
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const loadingScreen = document.getElementById('loadingScreen');
+            
+            if (isMobileDevice()) {
+                // Show mobile landing page
+                mobileSite.style.display = 'block';
+                canvasContainer.style.display = 'none';
+                welcomeScreen.style.display = 'none';
+                loadingScreen.style.display = 'none';
+                
+                console.log('Mobile device detected - showing landing page');
+            } else {
+                // Show desktop 3D museum
+                mobileSite.style.display = 'none';
+                canvasContainer.style.display = 'block';
+                
+                // Initialize 3D museum
+                setTimeout(() => {
+                    initScene();
+                    loadingScreen.style.display = 'none';
+                }, 1000);
+                
+                console.log('Desktop device detected - loading 3D museum');
+            }
+        }
+        
+        // Run on page load
+        window.addEventListener('DOMContentLoaded', initApp);
+        
+        // ===== EXISTING 3D MUSEUM CODE =====
+        
         // Initialize
         let scene, camera, renderer;
         let doorLeft, doorRight;
